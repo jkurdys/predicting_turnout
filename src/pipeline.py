@@ -20,7 +20,7 @@ def get_data(filename, pickle=False):
     df = pd.read_csv(f'../data/ga_archive/{filename}', sep = '|')
     return df
 
-def clean_data(df):
+def clean_data(df, save=False):
     vmask = df['date_last_voted'] >= '2020-11-03'
     df['voted'] = vmask.map({True: int(1), False: int(0)})
     
@@ -110,9 +110,13 @@ def clean_data(df):
 
     df = df.drop('county', axis=1)
     
+    if save:
+        pd.to_pickle(df, '../data/tot_samp.pkl')
+        return df
+
     return df
 
-def clean_data_for_eda(df):
+def clean_data_for_eda(df, save=False):
     vmask = df['date_last_voted'] >= '2020-11-03'
     df['voted'] = vmask.map({True: int(1), False: int(0)})
     
@@ -181,10 +185,16 @@ def clean_data_for_eda(df):
     df = df.drop(['birthyear'], axis=1)
     
     df.congressional_district = df.congressional_district.astype('str')
+
+    if save:
+        pd.to_pickle(df, '../data/tot_samp_eda.pkl')
+        return df
     
     return df
 
 
 
 if __name__=='__main__':
-    pass
+    df = get_data('df_samp.pkl', pickle=True)
+    tot = clean_data(df, save=True)
+    tot_eda = clean_data_for_eda(df, save=True)
